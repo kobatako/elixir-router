@@ -45,9 +45,8 @@ defmodule Packet do
         IO.puts "proc_internet type ipv4"
         IO.inspect data
         IO.inspect Enum.join(dest)
-        dest_ip = Routing.search_routing_table(data[:destaddress])
-        :ets.lookup(:arp_table, Enum.join(dest))
-        |> dest_ip
+        Routing.fetch_routing_record(data[:destaddress])
+        |> def_ip
     end
 
     def proc_internet(data, @type_arp, dest, source) do
@@ -62,12 +61,27 @@ defmodule Packet do
         IO.inspect data
     end
 
-    def dest_ip([]) do
+    def def_ip([]) do
+        []
+    end
+    def def_ip(dest) do 
+        dest
+        |> Enum.map(fn(record) -> :ets.lookup(:arp_table, Enum.join(record)) end)
+        |> dest_mac_address
+    end
+
+    @doc """
+    This is not match arp table record
+    """
+    def dest_mac_address([]) do
         IO.puts "dest ip []"
         broadcast_arp_request()
     end
 
-    def dest_ip([{obj}]) do
+    @doc """
+    this is match arp record
+    """
+    def dest_mac_address([{obj}]) do
         IO.puts "dest ip [{obj}]"
         IO.inspect obj
     end
