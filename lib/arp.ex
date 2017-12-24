@@ -11,6 +11,6 @@ defmodule Arp do
     this si arp init
     """
     def init() do
-        arp_table = :ets.new(:arp_table, [:set, :public, :named_table])
+        :ets.new(:arp_table, [:set, :public, :named_table])
     end
 end
